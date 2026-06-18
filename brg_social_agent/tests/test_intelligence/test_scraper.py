@@ -1,4 +1,3 @@
-import pytest
 from datetime import timezone
 from unittest.mock import patch, MagicMock
 from engines.intelligence.scraper import ContentItem, scrape_rss

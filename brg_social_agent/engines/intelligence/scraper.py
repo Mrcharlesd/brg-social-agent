@@ -40,9 +40,10 @@ def scrape_rss(source: Source) -> list[ContentItem]:
     feed = feedparser.parse(source.url)
     items = []
     for entry in feed.entries[:10]:
-        try:
-            ts = datetime(*entry.published_parsed[:6], tzinfo=timezone.utc)
-        except (AttributeError, TypeError):
+        ts_tuple = getattr(entry, "published_parsed", None)
+        if ts_tuple:
+            ts = datetime(*ts_tuple[:6], tzinfo=timezone.utc)
+        else:
             ts = datetime.now(timezone.utc)
         items.append(ContentItem(
             title=getattr(entry, "title", "").strip(),
