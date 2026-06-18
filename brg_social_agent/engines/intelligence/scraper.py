@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime, timezone
 
 
@@ -13,6 +13,10 @@ class ContentItem:
     shares: int = 0
     comments: int = 0
     score: float = 0.0
+
+    def __post_init__(self):
+        if self.timestamp.tzinfo is None:
+            raise ValueError("ContentItem.timestamp must be timezone-aware UTC")
 
     def to_dict(self) -> dict:
         return {

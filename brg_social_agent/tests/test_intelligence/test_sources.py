@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+import pytest
 from engines.intelligence.scraper import ContentItem
 from engines.intelligence.sources import SOURCES, SourceType
 
@@ -20,6 +21,17 @@ def test_content_item_to_dict_contains_required_keys():
     assert d["source"] == "Forbes Leadership"
     assert d["timestamp"] == "2026-06-18T10:00:00+00:00"
     assert d["score"] == 0.75
+
+
+def test_content_item_raises_on_naive_timestamp():
+    with pytest.raises(ValueError, match="timezone-aware"):
+        ContentItem(
+            title="Test",
+            body="Body",
+            url="https://example.com",
+            source="Test",
+            timestamp=datetime(2026, 6, 18, 10, 0, 0),  # naive — no tzinfo
+        )
 
 
 def test_sources_registry_contains_rss_sources():
