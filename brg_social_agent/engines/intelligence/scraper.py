@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime, timezone
 import feedparser
+import praw
 
 from .sources import Source
 
@@ -55,7 +56,7 @@ def scrape_rss(source: Source) -> list[ContentItem]:
     return items
 
 
-def scrape_reddit(source: Source, reddit) -> list[ContentItem]:
+def scrape_reddit(source: Source, reddit: praw.Reddit) -> list[ContentItem]:
     """Scrape Reddit subreddit and return ContentItems."""
     subreddit = reddit.subreddit(source.subreddit)
     items = []
