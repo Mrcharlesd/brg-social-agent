@@ -2,8 +2,6 @@ import os
 from dataclasses import dataclass, field
 from dotenv import load_dotenv
 
-load_dotenv()
-
 
 def _require(key: str) -> str:
     val = os.getenv(key)
@@ -38,4 +36,5 @@ class Config:
 
 
 def load_config() -> Config:
+    load_dotenv()
     return Config()
