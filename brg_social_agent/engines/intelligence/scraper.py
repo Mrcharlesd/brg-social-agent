@@ -1,5 +1,8 @@
 from dataclasses import dataclass
 from datetime import datetime, timezone
+import feedparser
+
+from .sources import Source
 
 
 @dataclass
@@ -30,3 +33,22 @@ class ContentItem:
             "comments": self.comments,
             "score": self.score,
         }
+
+
+def scrape_rss(source: Source) -> list[ContentItem]:
+    """Scrape RSS feed and return up to 10 ContentItems."""
+    feed = feedparser.parse(source.url)
+    items = []
+    for entry in feed.entries[:10]:
+        try:
+            ts = datetime(*entry.published_parsed[:6], tzinfo=timezone.utc)
+        except (AttributeError, TypeError):
+            ts = datetime.now(timezone.utc)
+        items.append(ContentItem(
+            title=getattr(entry, "title", "").strip(),
+            body=getattr(entry, "summary", "")[:1000].strip(),
+            url=getattr(entry, "link", ""),
+            source=source.name,
+            timestamp=ts,
+        ))
+    return items
