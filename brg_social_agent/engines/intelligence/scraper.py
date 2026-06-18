@@ -53,3 +53,22 @@ def scrape_rss(source: Source) -> list[ContentItem]:
             timestamp=ts,
         ))
     return items
+
+
+def scrape_reddit(source: Source, reddit) -> list[ContentItem]:
+    """Scrape Reddit subreddit and return ContentItems."""
+    subreddit = reddit.subreddit(source.subreddit)
+    items = []
+    for post in subreddit.hot(limit=25):
+        if post.stickied:
+            continue
+        items.append(ContentItem(
+            title=post.title,
+            body=post.selftext[:500].strip(),
+            url=f"https://reddit.com{post.permalink}",
+            source=source.name,
+            timestamp=datetime.fromtimestamp(post.created_utc, tz=timezone.utc),
+            likes=post.score,
+            comments=post.num_comments,
+        ))
+    return items
