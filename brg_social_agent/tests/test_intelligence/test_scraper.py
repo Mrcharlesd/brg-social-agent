@@ -77,9 +77,11 @@ def _mock_reddit_post(title="Leadership mindset shift", score=450,
 def test_scrape_reddit_returns_content_items():
     import praw
     source = Source(name="Reddit Leadership", type=SourceType.REDDIT, subreddit="leadership")
-    mock_reddit = MagicMock()
+    mock_reddit = MagicMock(spec=praw.Reddit)
+    # Use configure_mock to work around spec restrictions
+    mock_reddit.configure_mock(subreddit=MagicMock())
     mock_reddit.subreddit.return_value.hot.return_value = [_mock_reddit_post()]
-    with patch("engines.intelligence.scraper.praw.Reddit", return_value=mock_reddit):
+    with patch("engines.intelligence.scraper.praw"):
         from engines.intelligence.scraper import scrape_reddit
         items = scrape_reddit(source, mock_reddit)
     assert len(items) == 1
@@ -95,9 +97,11 @@ def test_scrape_reddit_skips_stickied_posts():
     stickied.stickied = True
     normal = _mock_reddit_post(title="Normal post")
     source = Source(name="Reddit Leadership", type=SourceType.REDDIT, subreddit="leadership")
-    mock_reddit = MagicMock()
+    mock_reddit = MagicMock(spec=praw.Reddit)
+    # Use configure_mock to work around spec restrictions
+    mock_reddit.configure_mock(subreddit=MagicMock())
     mock_reddit.subreddit.return_value.hot.return_value = [stickied, normal]
-    with patch("engines.intelligence.scraper.praw.Reddit", return_value=mock_reddit):
+    with patch("engines.intelligence.scraper.praw"):
         from engines.intelligence.scraper import scrape_reddit
         items = scrape_reddit(source, mock_reddit)
     assert len(items) == 1
