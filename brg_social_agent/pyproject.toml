@@ -32,3 +32,6 @@ build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "integration: mark test as integration test requiring playwright install chromium",
+]
