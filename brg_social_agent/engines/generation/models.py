@@ -71,4 +71,4 @@ class ContentPackage(BaseModel):
     keywords: list[str] = Field(default_factory=list)
     hashtags: list[str] = Field(default_factory=list)
     location_signals: list[str] = Field(default_factory=list)
-    generated_at: str
+    generated_at: datetime

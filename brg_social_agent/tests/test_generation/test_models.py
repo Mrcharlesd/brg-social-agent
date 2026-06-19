@@ -1,4 +1,5 @@
 import pytest
+from datetime import datetime, timezone
 from pydantic import ValidationError
 
 
@@ -40,7 +41,7 @@ def _package():
                 StoryFrame(text="CTA text", purpose="cta"),
             ]
         ),
-        generated_at="2026-01-01T00:00:00+00:00",
+        generated_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
     )
 
 
@@ -140,3 +141,4 @@ def test_content_package_round_trips_to_json():
     restored = ContentPackage.model_validate_json(json_str)
     assert restored.post_id == pkg.post_id
     assert restored.mood == pkg.mood
+    assert restored.generated_at == pkg.generated_at
