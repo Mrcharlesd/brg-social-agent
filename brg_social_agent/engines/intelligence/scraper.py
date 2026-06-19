@@ -3,7 +3,8 @@ from datetime import datetime, timezone
 import feedparser
 import praw
 
-from .sources import Source
+from config import Config
+from .sources import Source, SOURCES, SourceType
 
 
 @dataclass
@@ -72,4 +73,22 @@ def scrape_reddit(source: Source, reddit: praw.Reddit) -> list[ContentItem]:
             likes=post.score,
             comments=post.num_comments,
         ))
+    return items
+
+
+def scrape_all(config: Config) -> list[ContentItem]:
+    """Scrape all configured sources and return combined ContentItems."""
+    reddit = praw.Reddit(
+        client_id=config.reddit_client_id,
+        client_secret=config.reddit_client_secret,
+        user_agent=config.reddit_user_agent,
+    )
+    items: list[ContentItem] = []
+    for source in SOURCES:
+        if source.type == SourceType.RSS:
+            items.extend(scrape_rss(source))
+        elif source.type == SourceType.REDDIT:
+            items.extend(scrape_reddit(source, reddit))
+        # SourceType.YOUTUBE, SourceType.TRENDS, and Playwright-based sources
+        # (LinkedIn, competitor accounts) are implemented in Phase 1 Extension — see note below.
     return items
