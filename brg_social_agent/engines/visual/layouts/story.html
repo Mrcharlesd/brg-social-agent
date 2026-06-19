@@ -156,6 +156,7 @@ body {
 
 <div class="top-bar">
   <div class="progress-track">
+    <!-- Always 3 segments: StoryContent.frames is fixed at exactly 3 (hook, insight, cta) -->
     {% for i in range(3) %}
     <div class="progress-segment {% if i <= frame_index %}complete{% endif %}"></div>
     {% endfor %}
