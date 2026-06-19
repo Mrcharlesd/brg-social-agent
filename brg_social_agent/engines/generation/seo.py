@@ -1,4 +1,4 @@
-from .models import ContentPackage, PostContent
+from .models import ContentPackage
 
 _BRG_GEOGRAPHIES: list[str] = [
     "Chicago, IL",
