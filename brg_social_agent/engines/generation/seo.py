@@ -44,7 +44,10 @@ def validate_hashtags(package: ContentPackage) -> ContentPackage:
 
 
 def add_location_signals(package: ContentPackage) -> ContentPackage:
-    """Append a BRG geo context sentence to the post body and populate location_signals."""
+    """Append a BRG geo context sentence to the post body and populate location_signals.
+    Idempotent — returns unchanged package if location_signals already populated."""
+    if package.location_signals:
+        return package
     geo_list = _BRG_GEOGRAPHIES[:-1]
     geo_last = _BRG_GEOGRAPHIES[-1]
     geo_str = ", ".join(geo_list) + f", and {geo_last}"

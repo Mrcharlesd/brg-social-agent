@@ -21,7 +21,7 @@ def run_generation_pipeline(config: Config) -> list[str]:
         log.warning("trends.json not found at %s — nothing to generate", trends_path)
         return []
 
-    with open(trends_path) as f:
+    with open(trends_path, encoding="utf-8") as f:
         trends = json.load(f)
 
     post_ids: list[str] = []
@@ -35,14 +35,29 @@ def run_generation_pipeline(config: Config) -> list[str]:
             log.warning("Generation failed for %r: %s", title, exc)
             continue
 
-        if not voice_check(package, config):
+        # First quality check
+        try:
+            passes = voice_check(package, config)
+        except Exception as exc:
+            log.warning("Voice check error for %r: %s — skipping", title, exc)
+            continue
+
+        if not passes:
             log.info("Voice check failed — retrying generation for: %s", title)
             try:
                 package = generate_content_package(item, config)
             except Exception as exc:
                 log.warning("Retry generation failed for %r: %s", title, exc)
                 continue
-            if not voice_check(package, config):
+
+            # Second quality check
+            try:
+                passes = voice_check(package, config)
+            except Exception as exc:
+                log.warning("Retry voice check error for %r: %s — skipping", title, exc)
+                continue
+
+            if not passes:
                 log.warning("Skipping %r — failed voice check twice", title)
                 continue
 
@@ -52,7 +67,7 @@ def run_generation_pipeline(config: Config) -> list[str]:
         out_dir = Path(config.queue_dir) / package.post_id
         out_dir.mkdir(parents=True, exist_ok=True)
         content_path = out_dir / "content.json"
-        with open(content_path, "w") as f:
+        with open(content_path, "w", encoding="utf-8") as f:
             f.write(package.model_dump_json(indent=2))
 
         log.info("Wrote %s", content_path)
