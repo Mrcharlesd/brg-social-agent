@@ -67,7 +67,7 @@ def _build_specs(package: ContentPackage, brand: BrandContext) -> dict[str, list
                 "quote_text": package.quote.quote,
                 "attribution": package.quote.attribution,
                 "show_headshot": brand.headshot_path is not None,
-                "headshot_path": brand.headshot_path or "",
+                "headshot_path": f"file://{brand.headshot_path}" if brand.headshot_path else "",
             },
             output_filename="quote.png",
         )
@@ -138,7 +138,8 @@ def render_package(
                 for spec in render_specs:
                     html = env.get_template(spec.template_name).render(**spec.context)
                     page.set_viewport_size({"width": spec.width, "height": spec.height})
-                    page.set_content(html, wait_until="networkidle")
+                    page.set_content(html, wait_until="domcontentloaded")
+                    page.evaluate("() => document.fonts.ready")
                     out_path = out_dir / spec.output_filename
                     page.screenshot(path=str(out_path), full_page=False)
                     paths.append(out_path)

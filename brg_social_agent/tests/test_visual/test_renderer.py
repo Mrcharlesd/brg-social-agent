@@ -113,6 +113,28 @@ def test_build_specs_quote_passes_quote_text(package, brand):
     assert specs["quote"][0].context["quote_text"] == package.quote.quote
 
 
+def test_build_specs_quote_headshot_has_file_prefix_when_present(package, sample_brand):
+    # Build a brand with a headshot path set
+    brand_with_headshot = BrandContext(
+        primary_color=sample_brand.primary_color,
+        accent_color=sample_brand.accent_color,
+        font_family=sample_brand.font_family,
+        logo_svg=sample_brand.logo_svg,
+        headshot_path="/path/to/headshot.jpg",
+    )
+    specs = _build_specs(package, brand_with_headshot)
+    ctx = specs["quote"][0].context
+    assert ctx["headshot_path"] == "file:///path/to/headshot.jpg"
+    assert ctx["show_headshot"] is True
+
+
+def test_build_specs_quote_headshot_empty_when_none(package, sample_brand):
+    specs = _build_specs(package, sample_brand)  # sample_brand.headshot_path is None
+    ctx = specs["quote"][0].context
+    assert ctx["headshot_path"] == ""
+    assert ctx["show_headshot"] is False
+
+
 def test_build_specs_thumbnail_passes_hook_and_title(package, brand):
     specs = _build_specs(package, brand)
     ctx = specs["thumbnail"][0].context
