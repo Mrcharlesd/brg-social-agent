@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 1080px;
+  height: 1080px;
+  overflow: hidden;
+  font-family: '{{ brand.font_family }}', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+}
+
+:root {
+  --primary: {{ brand.primary_color }};
+  --accent: {{ brand.accent_color }};
+  {% if mood == "dark" %}
+  --bg: var(--primary);
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.60);
+  {% else %}
+  --bg: #F6F6FA;
+  --text-primary: var(--primary);
+  --text-secondary: rgba(26, 26, 46, 0.55);
+  {% endif %}
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 88px 96px;
+  position: relative;
+  text-align: center;
+}
+
+/* Decorative corner accent */
+.corner-accent {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 140px 140px 0;
+  border-color: transparent var(--accent) transparent transparent;
+  opacity: 0.12;
+}
+
+/* Bottom stripe */
+.accent-stripe {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: var(--accent);
+}
+
+/* Left accent bar */
+.left-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 8px;
+  background: var(--accent);
+  opacity: 0.3;
+}
+
+.quote-mark {
+  font-size: 160px;
+  font-weight: 900;
+  color: var(--accent);
+  line-height: 0.55;
+  margin-bottom: 36px;
+  opacity: 0.5;
+  font-style: normal;
+}
+
+.quote-text {
+  font-size: 46px;
+  font-weight: 700;
+  line-height: 1.28;
+  letter-spacing: -0.02em;
+  max-width: 860px;
+  margin-bottom: 44px;
+}
+
+.divider {
+  width: 56px;
+  height: 5px;
+  background: var(--accent);
+  border-radius: 2.5px;
+  margin: 0 auto 28px;
+}
+
+.attribution {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+/* Optional headshot overlay */
+.headshot {
+  position: absolute;
+  bottom: 52px;
+  left: 60px;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--accent);
+}
+
+.bottom-brand {
+  position: absolute;
+  bottom: 60px;
+  right: 60px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+</style>
+</head>
+<body>
+
+<div class="corner-accent"></div>
+<div class="accent-stripe"></div>
+<div class="left-bar"></div>
+
+<div class="quote-mark">&ldquo;</div>
+<p class="quote-text">{{ quote_text }}</p>
+<div class="divider"></div>
+<p class="attribution">&mdash; {{ attribution }}</p>
+
+{% if show_headshot and headshot_path %}
+<img class="headshot" src="{{ headshot_path }}" alt="Charles Butler">
+{% endif %}
+
+<span class="bottom-brand">Battle Rhythm Group</span>
+
+</body>
+</html>
