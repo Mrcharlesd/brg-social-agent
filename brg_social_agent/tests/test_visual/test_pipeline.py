@@ -4,7 +4,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from engines.visual import run_visual_pipeline
 from tests.conftest import make_test_config
