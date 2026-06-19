@@ -80,3 +80,20 @@ def test_pipeline_marks_topics_seen(tmp_path):
     with open(config.seen_topics_file) as f:
         seen = json.load(f)
     assert len(seen) == 3
+
+
+def test_scrape_all_dispatches_rss_and_reddit_sources(tmp_path):
+    """scrape_all must call scrape_rss for RSS sources and scrape_reddit for Reddit sources."""
+    from engines.intelligence.scraper import scrape_all
+    config = _make_config(tmp_path)
+
+    with patch("engines.intelligence.scraper.scrape_rss", return_value=[]) as mock_rss, \
+         patch("engines.intelligence.scraper.scrape_reddit", return_value=[]) as mock_reddit, \
+         patch("engines.intelligence.scraper.praw.Reddit"):
+        scrape_all(config)
+
+    from engines.intelligence.sources import SOURCES, SourceType
+    expected_rss = sum(1 for s in SOURCES if s.type == SourceType.RSS)
+    expected_reddit = sum(1 for s in SOURCES if s.type == SourceType.REDDIT)
+    assert mock_rss.call_count == expected_rss
+    assert mock_reddit.call_count == expected_reddit

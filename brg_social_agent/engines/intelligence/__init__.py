@@ -12,7 +12,7 @@ def run_intelligence_pipeline(config: Config) -> list[dict]:
     raw_items = scrape_all(config)
     top_items = rank(raw_items, config.seen_topics_file)
 
-    os.makedirs(os.path.dirname(config.trends_file), exist_ok=True)
+    os.makedirs(os.path.dirname(config.trends_file) or ".", exist_ok=True)
     output = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "items": [item.to_dict() for item in top_items],
