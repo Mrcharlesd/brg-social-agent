@@ -2,8 +2,6 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
-import pytest
-
 from engines.generation.models import (
     CarouselContent, CarouselSlide, ContentPackage,
     PostContent, QuoteContent, ScriptContent,
@@ -145,7 +143,6 @@ def test_pipeline_processes_multiple_items(tmp_path):
     config = _make_config(tmp_path)
 
     packages = [_make_package(post_id=f"topic-{i}-00000000") for i in range(3)]
-    pkg_iter = iter(packages)
 
     with patch("engines.generation.generate_content_package", side_effect=packages), \
          patch("engines.generation.voice_check", return_value=True):
