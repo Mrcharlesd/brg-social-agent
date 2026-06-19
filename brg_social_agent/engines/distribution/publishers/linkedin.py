@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import logging
 from pathlib import Path
-from typing import Optional
 
 import requests
 
@@ -20,7 +21,7 @@ class LinkedInPublisher:
         self._li_base = li_base.rstrip("/")
 
     @property
-    def _headers(self) -> dict:
+    def _headers(self) -> dict[str, str]:
         return {
             "Authorization": f"Bearer {self._token}",
             "Content-Type": "application/json",
@@ -63,7 +64,7 @@ class LinkedInPublisher:
         upload_resp.raise_for_status()
         return asset_urn
 
-    def publish_post(self, text: str, image_path: Optional[Path] = None) -> str:
+    def publish_post(self, text: str, image_path: Path | None = None) -> str:
         share_content: dict = {"shareCommentary": {"text": text}}
         if image_path is not None:
             asset_urn = self._upload_image(image_path)
