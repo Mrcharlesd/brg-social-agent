@@ -91,6 +91,18 @@ def test_is_duplicate_case_insensitive(tmp_path):
     assert is_duplicate("leadership topic", seen)
 
 
+def test_is_duplicate_returns_false_after_14_days(tmp_path):
+    seen_file = str(tmp_path / "seen.json")
+    seen = {}
+    mark_seen("Old topic", seen, seen_file)
+    # back-date entry beyond the 14-day window
+    seen["old topic"] = (datetime.now(timezone.utc) - timedelta(days=15)).isoformat()
+    with open(seen_file, "w") as f:
+        json.dump(seen, f)
+    seen = load_seen_topics(seen_file)
+    assert not is_duplicate("Old topic", seen)
+
+
 # --- rank() integration ---
 
 def test_rank_returns_sorted_highest_first(tmp_path):
@@ -106,7 +118,7 @@ def test_rank_limits_to_top_n(tmp_path):
     seen_file = str(tmp_path / "seen.json")
     items = [_item(title=f"Leadership article {i}") for i in range(30)]
     ranked = rank(items, seen_file, top_n=20)
-    assert len(ranked) <= 20
+    assert len(ranked) == 20
 
 
 def test_rank_excludes_seen_duplicates(tmp_path):

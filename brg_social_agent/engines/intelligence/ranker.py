@@ -37,9 +37,11 @@ def load_seen_topics(seen_file: str) -> dict[str, str]:
 
 
 def is_duplicate(title: str, seen: dict[str, str], days: int = 14) -> bool:
-    cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
     key = title.lower()
-    return key in seen and seen[key] > cutoff
+    if key not in seen:
+        return False
+    cutoff_dt = datetime.now(timezone.utc) - timedelta(days=days)
+    return datetime.fromisoformat(seen[key]) > cutoff_dt
 
 
 def mark_seen(title: str, seen: dict[str, str], seen_file: str) -> None:
