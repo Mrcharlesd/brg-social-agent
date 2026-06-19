@@ -22,6 +22,12 @@ def make_test_config(tmp_path: Optional[Path] = None, **overrides) -> Config:
     config.brand_font_family = "Inter"
     config.logo_path = "assets/brg_logo.svg"
     config.headshot_path = "assets/charles_headshot.jpg"
+    config.instagram_account_id = ""
+    config.instagram_access_token = ""
+    config.linkedin_person_id = ""
+    config.linkedin_access_token = ""
+    config.image_base_url = ""
+    config.enabled_platforms = ["instagram", "linkedin"]
     if tmp_path is not None:
         config.trends_file = str(tmp_path / "trends.json")
         config.seen_topics_file = str(tmp_path / "seen_topics.json")

@@ -37,6 +37,30 @@ class Config:
     errors_dir: str = field(default_factory=lambda: str(_PROJECT_ROOT / "data" / "errors"))
     logs_dir: str = field(default_factory=lambda: str(_PROJECT_ROOT / "data" / "logs"))
 
+    # Distribution
+    instagram_account_id: str = field(
+        default_factory=lambda: os.getenv("INSTAGRAM_ACCOUNT_ID", "")
+    )
+    instagram_access_token: str = field(
+        default_factory=lambda: os.getenv("INSTAGRAM_ACCESS_TOKEN", "")
+    )
+    linkedin_person_id: str = field(
+        default_factory=lambda: os.getenv("LINKEDIN_PERSON_ID", "")
+    )
+    linkedin_access_token: str = field(
+        default_factory=lambda: os.getenv("LINKEDIN_ACCESS_TOKEN", "")
+    )
+    image_base_url: str = field(
+        default_factory=lambda: os.getenv("IMAGE_BASE_URL", "")
+    )
+    enabled_platforms: list[str] = field(
+        default_factory=lambda: [
+            p.strip()
+            for p in os.getenv("ENABLED_PLATFORMS", "instagram,linkedin").split(",")
+            if p.strip()
+        ]
+    )
+
 
 def load_config() -> Config:
     load_dotenv()
