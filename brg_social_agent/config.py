@@ -1,6 +1,9 @@
 import os
 from dataclasses import dataclass, field
+from pathlib import Path
 from dotenv import load_dotenv
+
+_PROJECT_ROOT = Path(__file__).parent
 
 
 def _require(key: str) -> str:
@@ -25,14 +28,14 @@ class Config:
     logo_path: str = field(default_factory=lambda: os.getenv("LOGO_PATH", "assets/brg_logo.svg"))
     headshot_path: str = field(default_factory=lambda: os.getenv("HEADSHOT_PATH", "assets/charles_headshot.jpg"))
 
-    # Data paths
-    trends_file: str = "data/trends.json"
-    seen_topics_file: str = "data/seen_topics.json"
-    queue_dir: str = "data/queue"
-    posted_dir: str = "data/posted"
-    analytics_dir: str = "data/analytics"
-    errors_dir: str = "data/errors"
-    logs_dir: str = "data/logs"
+    # Data paths (anchored to project root so cron jobs work regardless of CWD)
+    trends_file: str = field(default_factory=lambda: str(_PROJECT_ROOT / "data" / "trends.json"))
+    seen_topics_file: str = field(default_factory=lambda: str(_PROJECT_ROOT / "data" / "seen_topics.json"))
+    queue_dir: str = field(default_factory=lambda: str(_PROJECT_ROOT / "data" / "queue"))
+    posted_dir: str = field(default_factory=lambda: str(_PROJECT_ROOT / "data" / "posted"))
+    analytics_dir: str = field(default_factory=lambda: str(_PROJECT_ROOT / "data" / "analytics"))
+    errors_dir: str = field(default_factory=lambda: str(_PROJECT_ROOT / "data" / "errors"))
+    logs_dir: str = field(default_factory=lambda: str(_PROJECT_ROOT / "data" / "logs"))
 
 
 def load_config() -> Config:

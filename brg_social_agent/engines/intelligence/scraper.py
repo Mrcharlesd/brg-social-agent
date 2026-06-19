@@ -1,10 +1,13 @@
 from dataclasses import dataclass
 from datetime import datetime, timezone
 import feedparser
+import logging
 import praw
 
 from config import Config
 from .sources import Source, SOURCES, SourceType
+
+log = logging.getLogger(__name__)
 
 
 @dataclass
@@ -77,20 +80,22 @@ def scrape_reddit(source: Source, reddit: praw.Reddit) -> list[ContentItem]:
 
 
 def scrape_all(config: Config) -> list[ContentItem]:
-    """Scrape all configured sources and return combined ContentItems."""
+    """Scrape all configured sources. Failures in individual sources are logged and skipped."""
     reddit: praw.Reddit | None = None
     items: list[ContentItem] = []
     for source in SOURCES:
-        if source.type == SourceType.RSS:
-            items.extend(scrape_rss(source))
-        elif source.type == SourceType.REDDIT:
-            if reddit is None:
-                reddit = praw.Reddit(
-                    client_id=config.reddit_client_id,
-                    client_secret=config.reddit_client_secret,
-                    user_agent=config.reddit_user_agent,
-                )
-            items.extend(scrape_reddit(source, reddit))
-        # SourceType.YOUTUBE, SourceType.TRENDS, and Playwright-based sources
-        # (LinkedIn, competitor accounts) are implemented in Phase 1 Extension — see note below.
+        try:
+            if source.type == SourceType.RSS:
+                items.extend(scrape_rss(source))
+            elif source.type == SourceType.REDDIT:
+                if reddit is None:
+                    reddit = praw.Reddit(
+                        client_id=config.reddit_client_id,
+                        client_secret=config.reddit_client_secret,
+                        user_agent=config.reddit_user_agent,
+                    )
+                items.extend(scrape_reddit(source, reddit))
+            # SourceType.YOUTUBE, TRENDS, and Playwright sources deferred — see Phase 1 Extension
+        except Exception as exc:
+            log.warning("Source %r failed: %s", source.name, exc)
     return items

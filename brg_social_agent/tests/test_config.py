@@ -24,5 +24,5 @@ def test_load_config_success(monkeypatch):
     monkeypatch.setenv("REDDIT_CLIENT_SECRET", "test-secret")
     config = load_config()
     assert config.anthropic_api_key == "test-key"
-    assert config.trends_file == "data/trends.json"
+    assert config.trends_file.endswith("data/trends.json")
     assert config.brand_primary_color == "#1A1A2E"

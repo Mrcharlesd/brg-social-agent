@@ -1,9 +1,13 @@
 import json
+import logging
 import math
 import os
+from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 
 from .scraper import ContentItem
+
+log = logging.getLogger(__name__)
 
 BRG_KEYWORDS = [
     "leadership", "coaching", "business", "entrepreneur", "productivity",
@@ -32,8 +36,12 @@ def relevance_score(title: str, body: str) -> float:
 def load_seen_topics(seen_file: str) -> dict[str, str]:
     if not os.path.exists(seen_file):
         return {}
-    with open(seen_file) as f:
-        return json.load(f)
+    try:
+        with open(seen_file) as f:
+            return json.load(f)
+    except json.JSONDecodeError:
+        log.warning("seen_topics.json is corrupt — resetting duplicate history")
+        return {}
 
 
 def is_duplicate(title: str, seen: dict[str, str], days: int = 14) -> bool:
@@ -58,9 +66,10 @@ def rank(
 ) -> list[ContentItem]:
     seen = load_seen_topics(seen_file)
     filtered = [item for item in items if not is_duplicate(item.title, seen)]
+    scored = []
     for item in filtered:
         r = recency_score(item.timestamp)
         e = engagement_score(item.likes, item.shares, item.comments)
         v = relevance_score(item.title, item.body)
-        item.score = round((r * 0.3) + (e * 0.3) + (v * 0.4), 4)
-    return sorted(filtered, key=lambda x: x.score, reverse=True)[:top_n]
+        scored.append(replace(item, score=round((r * 0.3) + (e * 0.3) + (v * 0.4), 4)))
+    return sorted(scored, key=lambda x: x.score, reverse=True)[:top_n]
