@@ -59,3 +59,4 @@ def test_render_quality_prompt_requests_json_output():
     from engines.generation.templates import render_quality_prompt
     prompt = render_quality_prompt(post_body="B", carousel_hook_title="T", carousel_hook_body="H")
     assert '"passes"' in prompt
+    assert '"reason"' in prompt
