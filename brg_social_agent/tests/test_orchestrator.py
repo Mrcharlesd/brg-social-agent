@@ -22,7 +22,7 @@ def test_phase_result_captures_error_message():
     phase = PhaseResult(name="generation", ids=[], error="API timeout")
     d = phase.__dict__
     assert d["error"] == "API timeout"
-    assert d["ids"] == []
+    assert d["ids"] == ()
 
 
 def test_run_full_pipeline_calls_all_four_phases(tmp_path):
@@ -47,7 +47,7 @@ def test_run_full_pipeline_records_ids_per_phase(tmp_path):
          patch("engines.orchestrator.run_distribution_pipeline", return_value=["gen-1"]):
         result = run_full_pipeline(config)
     gen_phase = next(p for p in result.phases if p.name == "generation")
-    assert gen_phase.ids == ["gen-1", "gen-2"]
+    assert gen_phase.ids == ("gen-1", "gen-2")
     assert gen_phase.error is None
 
 
@@ -60,7 +60,7 @@ def test_run_full_pipeline_isolates_phase_error(tmp_path):
         result = run_full_pipeline(config)
     intel_phase = next(p for p in result.phases if p.name == "intelligence")
     assert intel_phase.error == "network down"
-    assert intel_phase.ids == []
+    assert intel_phase.ids == ()
     mock_gen.assert_called_once()
     mock_vis.assert_called_once()
     mock_dist.assert_called_once()
