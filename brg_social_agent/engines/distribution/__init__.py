@@ -58,16 +58,23 @@ def run_distribution_pipeline(config: Config) -> list[str]:
             log.warning("Failed to load content package at %s: %s", content_path, exc)
             continue
 
-        state = load_state(post_dir)
+        try:
+            state = load_state(post_dir)
+        except Exception as exc:
+            log.warning("Failed to load distribution state at %s: %s", post_dir, exc)
+            continue
         any_new = False
 
         if "instagram" in publishers and not state.is_distributed_to("instagram"):
             try:
-                _distribute_instagram(publishers["instagram"], package, post_dir)
-                state = state.mark_distributed("instagram")
-                save_state(state, post_dir)
-                any_new = True
-                log.info("Distributed %s to Instagram", package.post_id)
+                published = _distribute_instagram(publishers["instagram"], package, post_dir)
+                if published:
+                    state = state.mark_distributed("instagram")
+                    save_state(state, post_dir)
+                    any_new = True
+                    log.info("Distributed %s to Instagram", package.post_id)
+                else:
+                    log.info("No Instagram assets found for %s — skipping", package.post_id)
             except Exception as exc:
                 log.warning("Instagram failed for %s: %s", package.post_id, exc)
 
@@ -89,7 +96,8 @@ def run_distribution_pipeline(config: Config) -> list[str]:
 
 def _distribute_instagram(
     ig: InstagramPublisher, package: ContentPackage, post_dir: Path
-) -> None:
+) -> bool:
+    published = False
     carousel_slides = sorted(post_dir.glob("carousel_slide_*.png"))
     if carousel_slides:
         ig.publish_carousel(
@@ -97,9 +105,12 @@ def _distribute_instagram(
             slide_filenames=[p.name for p in carousel_slides],
             caption=_build_ig_caption(package),
         )
+        published = True
     story_frame = post_dir / "story_frame_000.png"
     if story_frame.exists():
         ig.publish_story(post_id=package.post_id, filename="story_frame_000.png")
+        published = True
+    return published
 
 
 def _distribute_linkedin(

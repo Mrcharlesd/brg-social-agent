@@ -192,3 +192,47 @@ def test_returns_post_id_when_one_platform_fails_but_other_succeeds(
         result = run_distribution_pipeline(config)
 
     assert result == [post_id]
+
+
+def test_continues_when_distributed_json_is_corrupted(tmp_path, sample_content_package_dict):
+    config = make_test_config(
+        tmp_path,
+        enabled_platforms=["instagram"],
+        instagram_account_id="ig-123",
+        instagram_access_token="ig-tok",
+        image_base_url="https://example.com/queue",
+    )
+    post_id = sample_content_package_dict["post_id"]
+    post_dir = Path(config.queue_dir) / post_id
+    _write_content(post_dir, sample_content_package_dict)
+    _write_png(post_dir, "carousel_slide_000.png")
+    (post_dir / "distributed.json").write_text("NOT_VALID_JSON", encoding="utf-8")
+
+    with patch("engines.distribution.InstagramPublisher") as MockIG:
+        MockIG.return_value.publish_carousel.return_value = "media-1"
+        result = run_distribution_pipeline(config)
+
+    assert result == []
+    MockIG.return_value.publish_carousel.assert_not_called()
+
+
+def test_does_not_mark_instagram_distributed_when_no_assets_found(tmp_path, sample_content_package_dict):
+    config = make_test_config(
+        tmp_path,
+        enabled_platforms=["instagram"],
+        instagram_account_id="ig-123",
+        instagram_access_token="ig-tok",
+        image_base_url="https://example.com/queue",
+    )
+    post_id = sample_content_package_dict["post_id"]
+    post_dir = Path(config.queue_dir) / post_id
+    _write_content(post_dir, sample_content_package_dict)
+    _write_png(post_dir, "quote.png")
+
+    with patch("engines.distribution.InstagramPublisher") as MockIG:
+        result = run_distribution_pipeline(config)
+
+    assert result == []
+    MockIG.return_value.publish_carousel.assert_not_called()
+    MockIG.return_value.publish_story.assert_not_called()
+    assert not (post_dir / "distributed.json").exists()
