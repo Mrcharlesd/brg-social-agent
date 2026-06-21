@@ -21,13 +21,13 @@ class Source:
 
 SOURCES: list[Source] = [
     # News / RSS
-    Source(name="Forbes Leadership", type=SourceType.RSS,
-           url="https://www.forbes.com/leadership/feed/"),
-    Source(name="Harvard Business Review", type=SourceType.RSS,
-           url="https://hbr.org/rss/topic/leadership"),
-    Source(name="Inc Magazine", type=SourceType.RSS,
-           url="https://www.inc.com/rss.html"),
-    # Reddit
+    Source(name="MIT Sloan Management Review", type=SourceType.RSS,
+           url="https://sloanreview.mit.edu/rss/"),
+    Source(name="Fast Company Leadership", type=SourceType.RSS,
+           url="https://www.fastcompany.com/leadership/rss"),
+    Source(name="Entrepreneur", type=SourceType.RSS,
+           url="https://www.entrepreneur.com/latest.rss"),
+    # Reddit (optional — only active when REDDIT_CLIENT_ID is set)
     Source(name="Reddit Entrepreneur", type=SourceType.REDDIT, subreddit="Entrepreneur"),
     Source(name="Reddit Leadership", type=SourceType.REDDIT, subreddit="leadership"),
     Source(name="Reddit Self Improvement", type=SourceType.REDDIT, subreddit="selfimprovement"),
