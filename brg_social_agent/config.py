@@ -17,8 +17,8 @@ def _require(key: str) -> str:
 class Config:
     # Credentials
     anthropic_api_key: str = field(default_factory=lambda: _require("ANTHROPIC_API_KEY"))
-    reddit_client_id: str = field(default_factory=lambda: _require("REDDIT_CLIENT_ID"))
-    reddit_client_secret: str = field(default_factory=lambda: _require("REDDIT_CLIENT_SECRET"))
+    reddit_client_id: str = field(default_factory=lambda: os.getenv("REDDIT_CLIENT_ID", ""))
+    reddit_client_secret: str = field(default_factory=lambda: os.getenv("REDDIT_CLIENT_SECRET", ""))
     reddit_user_agent: str = "BRGSocialAgent/1.0"
 
     # Brand

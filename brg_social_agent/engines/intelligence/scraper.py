@@ -88,6 +88,8 @@ def scrape_all(config: Config) -> list[ContentItem]:
             if source.type == SourceType.RSS:
                 items.extend(scrape_rss(source))
             elif source.type == SourceType.REDDIT:
+                if not config.reddit_client_id:
+                    continue
                 if reddit is None:
                     reddit = praw.Reddit(
                         client_id=config.reddit_client_id,
